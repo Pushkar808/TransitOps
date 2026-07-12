@@ -1,0 +1,164 @@
+// TransitOps Prisma schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  FLEET_MANAGER
+  DRIVER
+  SAFETY_OFFICER
+  FINANCIAL_ANALYST
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  ON_TRIP
+  IN_SHOP
+  RETIRED
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
+
+enum TripStatus {
+  DRAFT
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+enum MaintenanceStatus {
+  OPEN
+  CLOSED
+}
+
+enum ExpenseType {
+  TOLL
+  FUEL
+  MAINTENANCE
+  OTHER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(DRIVER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdTrips Trip[] @relation("TripCreator")
+}
+
+model Vehicle {
+  id              String        @id @default(cuid())
+  registrationNo  String        @unique
+  name            String
+  type            String
+  maxLoadKg       Float
+  odometer        Float         @default(0)
+  acquisitionCost Float         @default(0)
+  region          String?
+  status          VehicleStatus @default(AVAILABLE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  trips        Trip[]
+  maintenance  MaintenanceLog[]
+  fuelLogs     FuelLog[]
+  expenses     Expense[]
+  documents    VehicleDocument[]
+}
+
+model VehicleDocument {
+  id        String   @id @default(cuid())
+  vehicleId String
+  title     String
+  url       String
+  createdAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model Driver {
+  id             String       @id @default(cuid())
+  name           String
+  licenseNo      String       @unique
+  licenseCategory String
+  licenseExpiry  DateTime
+  contact        String
+  safetyScore    Float        @default(100)
+  region         String?
+  status         DriverStatus @default(AVAILABLE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  trips Trip[]
+}
+
+model Trip {
+  id             String     @id @default(cuid())
+  source         String
+  destination    String
+  cargoWeightKg  Float
+  plannedDistance Float
+  finalOdometer  Float?
+  fuelConsumed   Float?
+  revenue        Float      @default(0)
+  status         TripStatus @default(DRAFT)
+
+  vehicleId String
+  driverId  String
+  createdById String?
+
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  driver    Driver  @relation(fields: [driverId], references: [id])
+  createdBy User?   @relation("TripCreator", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MaintenanceLog {
+  id          String            @id @default(cuid())
+  vehicleId   String
+  description String
+  cost        Float             @default(0)
+  status      MaintenanceStatus @default(OPEN)
+  openedAt    DateTime          @default(now())
+  closedAt    DateTime?
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model FuelLog {
+  id        String   @id @default(cuid())
+  vehicleId String
+  liters    Float
+  cost      Float
+  date      DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id        String      @id @default(cuid())
+  vehicleId String
+  type      ExpenseType @default(OTHER)
+  amount    Float
+  note      String?
+  date      DateTime    @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
