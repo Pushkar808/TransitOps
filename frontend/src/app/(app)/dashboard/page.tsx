@@ -27,6 +27,7 @@ import { Select } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
 import { toast } from 'sonner';
+import { Loader } from '@/components/loader';
 
 const PIE_COLORS = ['#4ade80', '#60a5fa', '#fbbf24', '#f87171', '#a78bfa'];
 
@@ -104,6 +105,11 @@ export default function DashboardPage() {
   React.useEffect(() => {
     load();
   }, [load]);
+
+  
+  if (!data) {
+    return <Loader />;
+  }
 
   const k = data?.kpis;
 

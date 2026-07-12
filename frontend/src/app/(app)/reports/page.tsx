@@ -2,16 +2,6 @@
 
 import * as React from 'react';
 import { Download } from 'lucide-react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +17,22 @@ import { api, downloadCsv } from '@/lib/api';
 import type { VehicleReportRow } from '@/lib/types';
 import { formatCurrency } from '@/lib/format';
 import { toast } from 'sonner';
+import { Loader } from '@/components/loader';
+import dynamic from 'next/dynamic';
+
+const ReportsChart = dynamic(() => import('@/components/reports-chart'), {
+  loading: () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Revenue vs Operational Cost</CardTitle>
+      </CardHeader>
+      <CardContent className="h-[320px] flex items-center justify-center">
+        <Loader className="min-h-0 py-0" />
+      </CardContent>
+    </Card>
+  ),
+  ssr: false,
+});
 
 interface ReportResponse {
   rows: VehicleReportRow[];
@@ -96,25 +102,7 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
       </div>
-
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Revenue vs Operational Cost</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-              <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} />
-              <Legend />
-              <Bar dataKey="Revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Operational" fill="#ef4444" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <ReportsChart chartData={chartData} />
 
       <Card>
         <CardHeader>

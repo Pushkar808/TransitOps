@@ -43,7 +43,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         e.preventDefault();
         return;
       }
-      setIsPending(true);
+      
+      // Defer disabling the button so the browser can fire the native submit event
+      setTimeout(() => setIsPending(true), 0);
+      
       try {
         if (onClick) {
           await Promise.resolve(onClick(e));

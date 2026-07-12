@@ -37,8 +37,8 @@ export default function FinancePage() {
   const [loading, setLoading] = React.useState(true);
 
   const [open, setOpen] = React.useState(false);
-  const [fuelForm, setFuelForm] = React.useState({ vehicleId: '', liters: 0, cost: 0 });
-  const [expenseForm, setExpenseForm] = React.useState({ vehicleId: '', type: 'TOLL', amount: 0, note: '' });
+  const [fuelForm, setFuelForm] = React.useState({ vehicleId: '', liters: '', cost: '' });
+  const [expenseForm, setExpenseForm] = React.useState({ vehicleId: '', type: 'TOLL', amount: '', note: '' });
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -72,7 +72,7 @@ export default function FinancePage() {
       });
       toast.success('Fuel log added');
       setOpen(false);
-      setFuelForm({ vehicleId: '', liters: 0, cost: 0 });
+      setFuelForm({ vehicleId: '', liters: '', cost: '' });
       load();
     } catch (err) {
       toast.error((err as Error).message);
@@ -259,7 +259,7 @@ export default function FinancePage() {
                 <Input
                   type="number"
                   value={fuelForm.liters}
-                  onChange={(e) => setFuelForm({ ...fuelForm, liters: Number(e.target.value) })}
+                  onChange={(e) => setFuelForm({ ...fuelForm, liters: e.target.value })}
                   required
                 />
               </div>
@@ -268,7 +268,7 @@ export default function FinancePage() {
                 <Input
                   type="number"
                   value={fuelForm.cost}
-                  onChange={(e) => setFuelForm({ ...fuelForm, cost: Number(e.target.value) })}
+                  onChange={(e) => setFuelForm({ ...fuelForm, cost: e.target.value })}
                   required
                 />
               </div>
@@ -312,7 +312,7 @@ export default function FinancePage() {
                 <Input
                   type="number"
                   value={expenseForm.amount}
-                  onChange={(e) => setExpenseForm({ ...expenseForm, amount: Number(e.target.value) })}
+                  onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                   required
                 />
               </div>

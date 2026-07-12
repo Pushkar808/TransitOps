@@ -41,13 +41,13 @@ export default function TripsPage() {
     destination: '',
     vehicleId: '',
     driverId: '',
-    cargoWeightKg: 0,
-    plannedDistance: 0,
-    revenue: 0,
+    cargoWeightKg: '',
+    plannedDistance: '',
+    revenue: '',
   });
 
   const [completeTrip, setCompleteTrip] = React.useState<Trip | null>(null);
-  const [completeForm, setCompleteForm] = React.useState({ finalOdometer: 0, fuelConsumed: 0, revenue: 0 });
+  const [completeForm, setCompleteForm] = React.useState({ finalOdometer: '', fuelConsumed: '', revenue: '' });
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -69,7 +69,7 @@ export default function TripsPage() {
   }, [load]);
 
   const openCreate = async () => {
-    setForm({ source: '', destination: '', vehicleId: '', driverId: '', cargoWeightKg: 0, plannedDistance: 0, revenue: 0 });
+    setForm({ source: '', destination: '', vehicleId: '', driverId: '', cargoWeightKg: '', plannedDistance: '', revenue: '' });
     try {
       const [v, d] = await Promise.all([
         api.get<Vehicle[]>('/vehicles/dispatchable'),
@@ -294,7 +294,7 @@ export default function TripsPage() {
               <Input
                 type="number"
                 value={form.cargoWeightKg}
-                onChange={(e) => setForm({ ...form, cargoWeightKg: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, cargoWeightKg: e.target.value })}
                 required
               />
               {selectedVehicle && form.cargoWeightKg > selectedVehicle.maxLoadKg && (
@@ -306,7 +306,7 @@ export default function TripsPage() {
               <Input
                 type="number"
                 value={form.plannedDistance}
-                onChange={(e) => setForm({ ...form, plannedDistance: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, plannedDistance: e.target.value })}
                 required
               />
             </div>
@@ -315,7 +315,7 @@ export default function TripsPage() {
               <Input
                 type="number"
                 value={form.revenue}
-                onChange={(e) => setForm({ ...form, revenue: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, revenue: e.target.value })}
               />
             </div>
           </div>
@@ -336,7 +336,7 @@ export default function TripsPage() {
             <Input
               type="number"
               value={completeForm.finalOdometer}
-              onChange={(e) => setCompleteForm({ ...completeForm, finalOdometer: Number(e.target.value) })}
+              onChange={(e) => setCompleteForm({ ...completeForm, finalOdometer: e.target.value })}
               required
             />
           </div>
@@ -345,7 +345,7 @@ export default function TripsPage() {
             <Input
               type="number"
               value={completeForm.fuelConsumed}
-              onChange={(e) => setCompleteForm({ ...completeForm, fuelConsumed: Number(e.target.value) })}
+              onChange={(e) => setCompleteForm({ ...completeForm, fuelConsumed: e.target.value })}
               required
             />
           </div>
@@ -354,7 +354,7 @@ export default function TripsPage() {
             <Input
               type="number"
               value={completeForm.revenue}
-              onChange={(e) => setCompleteForm({ ...completeForm, revenue: Number(e.target.value) })}
+              onChange={(e) => setCompleteForm({ ...completeForm, revenue: e.target.value })}
             />
           </div>
           <Button type="submit" className="w-full">
