@@ -10,25 +10,38 @@ import {
   Users,
   Gauge,
 } from 'lucide-react';
-import {
-  Bar,
-  BarChart,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
 import { toast } from 'sonner';
+import { Loader } from '../../../components/loader';
+import dynamic from 'next/dynamic';
 
-const PIE_COLORS = ['#4ade80', '#60a5fa', '#fbbf24', '#f87171', '#a78bfa'];
+const DashboardCharts = dynamic(() => import('@/components/dashboard-charts'), {
+  loading: () => (
+    <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle>Vehicles by Status</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[280px] flex items-center justify-center">
+          <Loader className="min-h-0 py-0" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Vehicles by Type</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[280px] flex items-center justify-center">
+          <Loader className="min-h-0 py-0" />
+        </CardContent>
+      </Card>
+    </div>
+  ),
+  ssr: false,
+});
 
 interface KpiProps {
   label: string;
@@ -60,27 +73,6 @@ function Kpi({ label, value, icon: Icon, iconColor = 'text-white/50' }: KpiProps
   );
 }
 
-// Custom tooltip for recharts
-function CustomTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div
-      className="rounded-xl px-3 py-2.5 text-xs"
-      style={{
-        background: 'rgba(14,14,14,0.95)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        backdropFilter: 'blur(12px)',
-      }}
-    >
-      {label && <p className="mb-1 font-medium text-white/60">{label}</p>}
-      {payload.map((p: any, i: number) => (
-        <p key={i} style={{ color: p.fill || p.color }}>
-          {p.name}: <span className="font-semibold text-white/90">{p.value}</span>
-        </p>
-      ))}
-    </div>
-  );
-}
 
 export default function DashboardPage() {
   const [data, setData] = React.useState<DashboardData | null>(null);
@@ -105,7 +97,11 @@ export default function DashboardPage() {
     load();
   }, [load]);
 
-  const k = data?.kpis;
+  if (!data) {
+    return <Loader />;
+  }
+
+  const k = data.kpis;
 
   return (
     <div>
@@ -142,66 +138,7 @@ export default function DashboardPage() {
         <Kpi label="Fleet Utilization" value={`${k?.fleetUtilization ?? 0}%`} icon={Gauge} iconColor="text-cyan-400" />
         <Kpi label="Total Vehicles" value={k?.totalVehicles ?? 0} icon={Truck} iconColor="text-white/50" />
       </div>
-
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Vehicles by Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie
-                  data={data?.charts.vehiclesByStatus ?? []}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={85}
-                  innerRadius={40}
-                  paddingAngle={3}
-                  label={({ name, value }) => `${name}: ${value}`}
-                  labelLine={false}
-                >
-                  {(data?.charts.vehiclesByStatus ?? []).map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Vehicles by Type</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={data?.charts.vehiclesByType ?? []} barSize={28}>
-                <XAxis
-                  dataKey="name"
-                  stroke="rgba(255,255,255,0.2)"
-                  tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="rgba(255,255,255,0.2)"
-                  tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  allowDecimals={false}
-                  width={30}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
-                <Bar dataKey="value" fill="rgba(255,255,255,0.55)" radius={[6, 6, 0, 0]} name="Count" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardCharts data={data} />
     </div>
   );
 }
