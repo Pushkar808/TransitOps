@@ -30,18 +30,22 @@ export default function MaintenancePage() {
   const canManage = hasRole('FLEET_MANAGER');
 
   const [logs, setLogs] = React.useState<MaintenanceLog[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [statusFilter, setStatusFilter] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
   const [form, setForm] = React.useState({ vehicleId: '', description: '', cost: 0 });
 
   const load = React.useCallback(async () => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (statusFilter) params.set('status', statusFilter);
     try {
       setLogs(await api.get<MaintenanceLog[]>(`/maintenance?${params.toString()}`));
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, [statusFilter]);
 
@@ -117,29 +121,40 @@ export default function MaintenancePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {logs.map((l) => (
-                <TableRow key={l.id}>
-                  <TableCell className="font-medium">{l.vehicle.registrationNo}</TableCell>
-                  <TableCell>{l.description}</TableCell>
-                  <TableCell>{formatCurrency(l.cost)}</TableCell>
-                  <TableCell>{formatDate(l.openedAt)}</TableCell>
-                  <TableCell>
-                    <Badge variant={l.status === 'OPEN' ? 'warning' : 'success'}>{l.status}</Badge>
-                  </TableCell>
-                  {canManage && (
-                    <TableCell className="text-right">
-                      {l.status === 'OPEN' && (
-                        <Button variant="ghost" size="sm" onClick={() => close(l)}>
-                          <CheckCircle className="h-4 w-4 text-green-500" /> Close
-                        </Button>
-                      )}
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-              {logs.length === 0 && (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={canManage ? 6 : 5} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+                      <p className="text-xs text-white/30">Loading maintenance records...</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                logs.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell className="font-medium">{l.vehicle.registrationNo}</TableCell>
+                    <TableCell>{l.description}</TableCell>
+                    <TableCell>{formatCurrency(l.cost)}</TableCell>
+                    <TableCell>{formatDate(l.openedAt)}</TableCell>
+                    <TableCell>
+                      <Badge variant={l.status === 'OPEN' ? 'warning' : 'success'}>{l.status}</Badge>
+                    </TableCell>
+                    {canManage && (
+                      <TableCell className="text-right">
+                        {l.status === 'OPEN' && (
+                          <Button variant="ghost" size="sm" onClick={() => close(l)}>
+                            <CheckCircle className="h-4 w-4 text-green-500" /> Close
+                          </Button>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )}
+              {!loading && logs.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={canManage ? 6 : 5} className="py-8 text-center text-muted-foreground">
                     No maintenance records
                   </TableCell>
                 </TableRow>

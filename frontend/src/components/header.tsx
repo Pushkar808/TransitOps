@@ -16,6 +16,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/maintenance': 'Maintenance',
   '/finance': 'Fuel & Expenses',
   '/reports': 'Reports & Analytics',
+  '/admin': 'Access Requests',
 };
 
 export function Header() {

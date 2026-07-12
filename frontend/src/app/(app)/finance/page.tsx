@@ -34,12 +34,14 @@ export default function FinancePage() {
   const [fuel, setFuel] = React.useState<FuelLog[]>([]);
   const [expenses, setExpenses] = React.useState<Expense[]>([]);
   const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
   const [open, setOpen] = React.useState(false);
   const [fuelForm, setFuelForm] = React.useState({ vehicleId: '', liters: 0, cost: 0 });
   const [expenseForm, setExpenseForm] = React.useState({ vehicleId: '', type: 'TOLL', amount: 0, note: '' });
 
   const load = React.useCallback(async () => {
+    setLoading(true);
     try {
       const [f, e, v] = await Promise.all([
         api.get<FuelLog[]>('/finance/fuel'),
@@ -51,6 +53,8 @@ export default function FinancePage() {
       setVehicles(v);
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -152,15 +156,26 @@ export default function FinancePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {fuel.map((f) => (
-                  <TableRow key={f.id}>
-                    <TableCell className="font-medium">{f.vehicle.registrationNo}</TableCell>
-                    <TableCell>{f.liters} L</TableCell>
-                    <TableCell>{formatCurrency(f.cost)}</TableCell>
-                    <TableCell>{formatDate(f.date)}</TableCell>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-12 text-center">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+                        <p className="text-xs text-white/30">Loading fuel logs...</p>
+                      </div>
+                    </TableCell>
                   </TableRow>
-                ))}
-                {fuel.length === 0 && (
+                ) : (
+                  fuel.map((f) => (
+                    <TableRow key={f.id}>
+                      <TableCell className="font-medium">{f.vehicle.registrationNo}</TableCell>
+                      <TableCell>{f.liters} L</TableCell>
+                      <TableCell>{formatCurrency(f.cost)}</TableCell>
+                      <TableCell>{formatDate(f.date)}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+                {!loading && fuel.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
                       No fuel logs
@@ -181,18 +196,29 @@ export default function FinancePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {expenses.map((ex) => (
-                  <TableRow key={ex.id}>
-                    <TableCell className="font-medium">{ex.vehicle.registrationNo}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{ex.type}</Badge>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-12 text-center">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+                        <p className="text-xs text-white/30">Loading expenses...</p>
+                      </div>
                     </TableCell>
-                    <TableCell>{formatCurrency(ex.amount)}</TableCell>
-                    <TableCell>{ex.note}</TableCell>
-                    <TableCell>{formatDate(ex.date)}</TableCell>
                   </TableRow>
-                ))}
-                {expenses.length === 0 && (
+                ) : (
+                  expenses.map((ex) => (
+                    <TableRow key={ex.id}>
+                      <TableCell className="font-medium">{ex.vehicle.registrationNo}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{ex.type}</Badge>
+                      </TableCell>
+                      <TableCell>{formatCurrency(ex.amount)}</TableCell>
+                      <TableCell>{ex.note}</TableCell>
+                      <TableCell>{formatDate(ex.date)}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+                {!loading && expenses.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                       No expenses

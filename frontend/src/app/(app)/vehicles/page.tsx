@@ -40,6 +40,7 @@ export default function VehiclesPage() {
   const canManage = hasRole('FLEET_MANAGER');
 
   const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('');
   const [typeFilter, setTypeFilter] = React.useState('');
@@ -51,6 +52,7 @@ export default function VehiclesPage() {
   const [docModal, setDocModal] = React.useState<Vehicle | null>(null);
 
   const load = React.useCallback(async () => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (statusFilter) params.set('status', statusFilter);
@@ -61,6 +63,8 @@ export default function VehiclesPage() {
       setVehicles(await api.get<Vehicle[]>(`/vehicles?${params.toString()}`));
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, [search, statusFilter, typeFilter, sortBy]);
 
@@ -180,37 +184,48 @@ export default function VehiclesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {vehicles.map((v) => (
-                <TableRow key={v.id}>
-                  <TableCell className="font-medium">{v.registrationNo}</TableCell>
-                  <TableCell>{v.name}</TableCell>
-                  <TableCell>{v.type}</TableCell>
-                  <TableCell>{v.maxLoadKg} kg</TableCell>
-                  <TableCell>{v.odometer.toLocaleString()} km</TableCell>
-                  <TableCell>{formatCurrency(v.acquisitionCost)}</TableCell>
-                  <TableCell>
-                    <Badge variant={vehicleStatusVariant[v.status]}>{formatStatus(v.status)}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => setDocModal(v)} title="Documents">
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      {canManage && (
-                        <>
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(v)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => remove(v)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </>
-                      )}
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+                      <p className="text-xs text-white/30">Loading vehicles...</p>
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
-              {vehicles.length === 0 && (
+              ) : (
+                vehicles.map((v) => (
+                  <TableRow key={v.id}>
+                    <TableCell className="font-medium">{v.registrationNo}</TableCell>
+                    <TableCell>{v.name}</TableCell>
+                    <TableCell>{v.type}</TableCell>
+                    <TableCell>{v.maxLoadKg} kg</TableCell>
+                    <TableCell>{v.odometer.toLocaleString()} km</TableCell>
+                    <TableCell>{formatCurrency(v.acquisitionCost)}</TableCell>
+                    <TableCell>
+                      <Badge variant={vehicleStatusVariant[v.status]}>{formatStatus(v.status)}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => setDocModal(v)} title="Documents">
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        {canManage && (
+                          <>
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(v)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => remove(v)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+              {!loading && vehicles.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                     No vehicles found

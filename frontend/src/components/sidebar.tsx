@@ -10,6 +10,7 @@ import {
   Wrench,
   Fuel,
   BarChart3,
+  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
@@ -30,6 +31,7 @@ const NAV: NavItem[] = [
   { href: '/maintenance', label: 'Maintenance', icon: Wrench },
   { href: '/finance', label: 'Fuel & Expenses', icon: Fuel },
   { href: '/reports', label: 'Reports', icon: BarChart3 },
+  { href: '/admin', label: 'Access Requests', icon: ShieldCheck, roles: ['ADMIN'] as Role[] },
 ];
 
 export function Sidebar() {

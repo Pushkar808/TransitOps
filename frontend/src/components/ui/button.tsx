@@ -35,9 +35,36 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => (
-    <button ref={ref} className={cn(buttonVariants({ variant, size, className }))} {...props} />
-  )
+  ({ className, variant, size, onClick, disabled, ...props }, ref) => {
+    const [isPending, setIsPending] = React.useState(false);
+
+    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled || isPending) {
+        e.preventDefault();
+        return;
+      }
+      setIsPending(true);
+      try {
+        if (onClick) {
+          await Promise.resolve(onClick(e));
+        }
+      } finally {
+        setTimeout(() => {
+          setIsPending(false);
+        }, 500);
+      }
+    };
+
+    return (
+      <button
+        ref={ref}
+        disabled={disabled || isPending}
+        onClick={handleClick}
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      />
+    );
+  }
 );
 Button.displayName = 'Button';
 

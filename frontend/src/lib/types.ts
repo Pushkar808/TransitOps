@@ -125,3 +125,21 @@ export interface VehicleReportRow {
   revenue: number;
   roi: number;
 }
+
+export type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface RegistrationRequest {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  status: RequestStatus;
+  licenseNo?: string | null;
+  licenseCategory?: string | null;
+  licenseExpiry?: string | null;
+  contact?: string | null;
+  reviewNote?: string | null;
+  createdAt: string;
+  reviewedAt?: string | null;
+}
+

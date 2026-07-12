@@ -35,12 +35,15 @@ interface ReportResponse {
 
 export default function ReportsPage() {
   const [report, setReport] = React.useState<ReportResponse | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    setLoading(true);
     api
       .get<ReportResponse>('/reports/vehicles')
       .then(setReport)
-      .catch((err) => toast.error((err as Error).message));
+      .catch((err) => toast.error((err as Error).message))
+      .finally(() => setLoading(false));
   }, []);
 
   const exportCsv = async () => {
@@ -131,23 +134,34 @@ export default function ReportsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => (
-                <TableRow key={r.registrationNo}>
-                  <TableCell className="font-medium">
-                    {r.registrationNo}
-                    <span className="block text-xs text-muted-foreground">{r.name}</span>
-                  </TableCell>
-                  <TableCell>{r.completedTrips}</TableCell>
-                  <TableCell>{r.distanceKm} km</TableCell>
-                  <TableCell>{r.fuelEfficiency}</TableCell>
-                  <TableCell>{formatCurrency(r.operationalCost)}</TableCell>
-                  <TableCell>{formatCurrency(r.revenue)}</TableCell>
-                  <TableCell className={r.roi >= 0 ? 'text-green-600' : 'text-destructive'}>
-                    {(r.roi * 100).toFixed(1)}%
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+                      <p className="text-xs text-white/30">Loading reports...</p>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))}
-              {rows.length === 0 && (
+              ) : (
+                rows.map((r) => (
+                  <TableRow key={r.registrationNo}>
+                    <TableCell className="font-medium">
+                      {r.registrationNo}
+                      <span className="block text-xs text-muted-foreground">{r.name}</span>
+                    </TableCell>
+                    <TableCell>{r.completedTrips}</TableCell>
+                    <TableCell>{r.distanceKm} km</TableCell>
+                    <TableCell>{r.fuelEfficiency}</TableCell>
+                    <TableCell>{formatCurrency(r.operationalCost)}</TableCell>
+                    <TableCell>{formatCurrency(r.revenue)}</TableCell>
+                    <TableCell className={r.roi >= 0 ? 'text-green-600' : 'text-destructive'}>
+                      {(r.roi * 100).toFixed(1)}%
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+              {!loading && rows.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                     No data available

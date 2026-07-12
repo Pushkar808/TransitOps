@@ -50,6 +50,29 @@ enum ExpenseType {
   OTHER
 }
 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model RegistrationRequest {
+  id               String        @id @default(cuid())
+  name             String
+  email            String
+  passwordHash     String
+  role             Role
+  status           RequestStatus @default(PENDING)
+  // Driver-specific optional fields stored for profile creation on approval
+  licenseNo        String?
+  licenseCategory  String?
+  licenseExpiry    DateTime?
+  contact          String?
+  reviewNote       String?
+  createdAt        DateTime      @default(now())
+  reviewedAt       DateTime?
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String

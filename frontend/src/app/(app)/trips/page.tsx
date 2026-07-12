@@ -29,6 +29,7 @@ export default function TripsPage() {
   const canManage = hasRole('DRIVER', 'FLEET_MANAGER');
 
   const [trips, setTrips] = React.useState<Trip[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [statusFilter, setStatusFilter] = React.useState('');
   const [search, setSearch] = React.useState('');
 
@@ -49,6 +50,7 @@ export default function TripsPage() {
   const [completeForm, setCompleteForm] = React.useState({ finalOdometer: 0, fuelConsumed: 0, revenue: 0 });
 
   const load = React.useCallback(async () => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (statusFilter) params.set('status', statusFilter);
     if (search) params.set('search', search);
@@ -56,6 +58,8 @@ export default function TripsPage() {
       setTrips(await api.get<Trip[]>(`/trips?${params.toString()}`));
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, [statusFilter, search]);
 
@@ -177,49 +181,60 @@ export default function TripsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trips.map((t) => (
-                <TableRow key={t.id}>
-                  <TableCell className="font-medium">
-                    {t.source} → {t.destination}
-                  </TableCell>
-                  <TableCell>{t.vehicle.registrationNo}</TableCell>
-                  <TableCell>{t.driver.name}</TableCell>
-                  <TableCell>{t.cargoWeightKg} kg</TableCell>
-                  <TableCell>{t.plannedDistance} km</TableCell>
-                  <TableCell>
-                    <Badge variant={tripStatusVariant[t.status]}>{formatStatus(t.status)}</Badge>
-                  </TableCell>
-                  {canManage && (
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        {t.status === 'DRAFT' && (
-                          <>
-                            <Button variant="ghost" size="icon" onClick={() => act(t, 'dispatch')} title="Dispatch">
-                              <Send className="h-4 w-4 text-primary" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => act(t, 'cancel')} title="Cancel">
-                              <XCircle className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </>
-                        )}
-                        {t.status === 'DISPATCHED' && (
-                          <>
-                            <Button variant="ghost" size="icon" onClick={() => openComplete(t)} title="Complete">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => act(t, 'cancel')} title="Cancel">
-                              <XCircle className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-              {trips.length === 0 && (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={canManage ? 7 : 6} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="h-6 w-6 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+                      <p className="text-xs text-white/30">Loading trips...</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                trips.map((t) => (
+                  <TableRow key={t.id}>
+                    <TableCell className="font-medium">
+                      {t.source} → {t.destination}
+                    </TableCell>
+                    <TableCell>{t.vehicle.registrationNo}</TableCell>
+                    <TableCell>{t.driver.name}</TableCell>
+                    <TableCell>{t.cargoWeightKg} kg</TableCell>
+                    <TableCell>{t.plannedDistance} km</TableCell>
+                    <TableCell>
+                      <Badge variant={tripStatusVariant[t.status]}>{formatStatus(t.status)}</Badge>
+                    </TableCell>
+                    {canManage && (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          {t.status === 'DRAFT' && (
+                            <>
+                              <Button variant="ghost" size="icon" onClick={() => act(t, 'dispatch')} title="Dispatch">
+                                <Send className="h-4 w-4 text-primary" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => act(t, 'cancel')} title="Cancel">
+                                <XCircle className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </>
+                          )}
+                          {t.status === 'DISPATCHED' && (
+                            <>
+                              <Button variant="ghost" size="icon" onClick={() => openComplete(t)} title="Complete">
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => act(t, 'cancel')} title="Cancel">
+                                <XCircle className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )}
+              {!loading && trips.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={canManage ? 7 : 6} className="py-8 text-center text-muted-foreground">
                     No trips found
                   </TableCell>
                 </TableRow>
