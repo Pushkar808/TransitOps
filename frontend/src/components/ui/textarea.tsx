@@ -8,9 +8,16 @@ const Textarea = React.forwardRef<
   <textarea
     ref={ref}
     className={cn(
-      'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+      'flex min-h-[80px] w-full rounded-lg px-3 py-2 text-sm text-white/90',
+      'placeholder-white/25 outline-none transition-all duration-200 resize-none',
+      'focus:ring-1 focus:ring-white/20 focus:border-white/25',
+      'disabled:cursor-not-allowed disabled:opacity-40',
       className
     )}
+    style={{
+      background: 'rgba(255,255,255,0.06)',
+      border: '1px solid rgba(255,255,255,0.10)',
+    }}
     {...props}
   />
 ));

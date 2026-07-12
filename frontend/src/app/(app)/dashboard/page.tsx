@@ -28,28 +28,57 @@ import { api } from '@/lib/api';
 import type { DashboardData } from '@/lib/types';
 import { toast } from 'sonner';
 
-const PIE_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+const PIE_COLORS = ['#4ade80', '#60a5fa', '#fbbf24', '#f87171', '#a78bfa'];
 
 interface KpiProps {
   label: string;
   value: number | string;
   icon: React.ComponentType<{ className?: string }>;
-  accent?: string;
+  iconColor?: string;
 }
 
-function Kpi({ label, value, icon: Icon, accent = 'text-primary' }: KpiProps) {
+function Kpi({ label, value, icon: Icon, iconColor = 'text-white/50' }: KpiProps) {
   return (
-    <Card>
-      <CardContent className="flex items-center gap-4 p-5">
-        <div className={`rounded-lg bg-muted p-3 ${accent}`}>
-          <Icon className="h-6 w-6" />
-        </div>
-        <div>
-          <p className="text-2xl font-bold">{value}</p>
-          <p className="text-xs text-muted-foreground">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div
+      className="rounded-xl p-5 flex items-center gap-4 transition-all duration-200 hover:scale-[1.01]"
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      }}
+    >
+      <div
+        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
+        style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)' }}
+      >
+        <Icon className={`h-5 w-5 ${iconColor}`} />
+      </div>
+      <div>
+        <p className="text-2xl font-semibold text-white/90 leading-none">{value}</p>
+        <p className="mt-1 text-xs text-white/38">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+// Custom tooltip for recharts
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      className="rounded-xl px-3 py-2.5 text-xs"
+      style={{
+        background: 'rgba(14,14,14,0.95)',
+        border: '1px solid rgba(255,255,255,0.12)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+      {label && <p className="mb-1 font-medium text-white/60">{label}</p>}
+      {payload.map((p: any, i: number) => (
+        <p key={i} style={{ color: p.fill || p.color }}>
+          {p.name}: <span className="font-semibold text-white/90">{p.value}</span>
+        </p>
+      ))}
+    </div>
   );
 }
 
@@ -103,39 +132,24 @@ export default function DashboardPage() {
         </Select>
       </PageHeader>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="Active Vehicles" value={k?.activeVehicles ?? 0} icon={Truck} />
-        <Kpi
-          label="Available Vehicles"
-          value={k?.availableVehicles ?? 0}
-          icon={CheckCircle2}
-          accent="text-green-500"
-        />
-        <Kpi
-          label="In Maintenance"
-          value={k?.inMaintenance ?? 0}
-          icon={Wrench}
-          accent="text-amber-500"
-        />
-        <Kpi label="Active Trips" value={k?.activeTrips ?? 0} icon={Route} />
-        <Kpi label="Pending Trips" value={k?.pendingTrips ?? 0} icon={Clock} accent="text-amber-500" />
-        <Kpi label="Drivers On Duty" value={k?.driversOnDuty ?? 0} icon={Users} />
-        <Kpi
-          label="Fleet Utilization"
-          value={`${k?.fleetUtilization ?? 0}%`}
-          icon={Gauge}
-          accent="text-blue-500"
-        />
-        <Kpi label="Total Vehicles" value={k?.totalVehicles ?? 0} icon={Truck} />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Kpi label="Active Vehicles" value={k?.activeVehicles ?? 0} icon={Truck} iconColor="text-white/70" />
+        <Kpi label="Available Vehicles" value={k?.availableVehicles ?? 0} icon={CheckCircle2} iconColor="text-emerald-400" />
+        <Kpi label="In Maintenance" value={k?.inMaintenance ?? 0} icon={Wrench} iconColor="text-amber-400" />
+        <Kpi label="Active Trips" value={k?.activeTrips ?? 0} icon={Route} iconColor="text-blue-400" />
+        <Kpi label="Pending Trips" value={k?.pendingTrips ?? 0} icon={Clock} iconColor="text-amber-400" />
+        <Kpi label="Drivers On Duty" value={k?.driversOnDuty ?? 0} icon={Users} iconColor="text-violet-400" />
+        <Kpi label="Fleet Utilization" value={`${k?.fleetUtilization ?? 0}%`} icon={Gauge} iconColor="text-cyan-400" />
+        <Kpi label="Total Vehicles" value={k?.totalVehicles ?? 0} icon={Truck} iconColor="text-white/50" />
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle>Vehicles by Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie
                   data={data?.charts.vehiclesByStatus ?? []}
@@ -143,30 +157,46 @@ export default function DashboardPage() {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={90}
-                  label
+                  outerRadius={85}
+                  innerRadius={40}
+                  paddingAngle={3}
+                  label={({ name, value }) => `${name}: ${value}`}
+                  labelLine={false}
                 >
                   {(data?.charts.vehiclesByStatus ?? []).map((_, i) => (
                     <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle>Vehicles by Type</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={data?.charts.vehiclesByType ?? []}>
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
-                <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} />
-                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={data?.charts.vehiclesByType ?? []} barSize={28}>
+                <XAxis
+                  dataKey="name"
+                  stroke="rgba(255,255,255,0.2)"
+                  tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke="rgba(255,255,255,0.2)"
+                  tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                  width={30}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                <Bar dataKey="value" fill="rgba(255,255,255,0.55)" radius={[6, 6, 0, 0]} name="Count" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

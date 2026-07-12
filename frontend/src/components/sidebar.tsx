@@ -10,7 +10,6 @@ import {
   Wrench,
   Fuel,
   BarChart3,
-  Truck as Logo,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
@@ -40,14 +39,34 @@ export function Sidebar() {
   const visible = NAV.filter((n) => !n.roles || hasRole(...n.roles));
 
   return (
-    <aside className="hidden w-64 flex-col border-r bg-card md:flex">
-      <div className="flex h-16 items-center gap-2 border-b px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground">
-          <Logo className="h-5 w-5" />
+    <aside
+      className="hidden w-64 flex-col md:flex"
+      style={{
+        background: 'rgba(0,0,0,0.6)',
+        borderRight: '1px solid rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
+    >
+      {/* Logo */}
+      <div
+        className="flex h-16 items-center gap-3 px-6"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <div
+          className="flex h-8 w-8 items-center justify-center rounded-lg"
+          style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)' }}
+        >
+          <Truck className="h-4 w-4 text-white" />
         </div>
-        <span className="text-lg font-bold">TransitOps</span>
+        <span className="text-base font-semibold tracking-tight text-white">TransitOps</span>
       </div>
-      <nav className="flex-1 space-y-1 p-3">
+
+      {/* Nav items */}
+      <nav className="flex-1 space-y-0.5 px-3 py-4">
+        <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-widest text-white/25">
+          Navigation
+        </p>
         {visible.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -56,18 +75,40 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 active
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  ? 'nav-active text-white'
+                  : 'text-white/45 hover:bg-white/5 hover:text-white/80'
               )}
             >
-              <Icon className="h-4 w-4" />
+              <Icon
+                className={cn(
+                  'h-4 w-4 transition-colors duration-200 flex-shrink-0',
+                  active ? 'text-white' : 'text-white/35 group-hover:text-white/70'
+                )}
+              />
               {item.label}
+              {active && (
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white/70" />
+              )}
             </Link>
           );
         })}
       </nav>
+
+      {/* Footer */}
+      <div
+        className="px-3 pb-4"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <div
+          className="mt-4 rounded-xl px-3 py-3"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <p className="text-[11px] font-medium text-white/40">Fleet Ops Platform</p>
+          <p className="text-[10px] text-white/25 mt-0.5">v1.0 · All systems operational</p>
+        </div>
+      </div>
     </aside>
   );
 }

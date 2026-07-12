@@ -13,7 +13,14 @@ Table.displayName = 'Table';
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />);
+>(({ className, ...props }, ref) => (
+  <thead
+    ref={ref}
+    className={cn('[&_tr]:border-b [&_tr]:border-white/6', className)}
+    style={{ background: 'rgba(255,255,255,0.025)' }}
+    {...props}
+  />
+));
 TableHeader.displayName = 'TableHeader';
 
 const TableBody = React.forwardRef<
@@ -28,7 +35,17 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <tr
       ref={ref}
-      className={cn('border-b transition-colors hover:bg-muted/50', className)}
+      className={cn(
+        'border-b transition-colors duration-150',
+        className
+      )}
+      style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.03)';
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLTableRowElement).style.background = '';
+      }}
       {...props}
     />
   )
@@ -41,7 +58,11 @@ const TableHead = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <th
     ref={ref}
-    className={cn('h-11 px-3 text-left align-middle font-medium text-muted-foreground', className)}
+    className={cn(
+      'h-10 px-3 text-left align-middle text-[11px] font-semibold uppercase tracking-wider',
+      className
+    )}
+    style={{ color: 'rgba(255,255,255,0.3)' }}
     {...props}
   />
 ));
@@ -51,7 +72,11 @@ const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
-  <td ref={ref} className={cn('p-3 align-middle', className)} {...props} />
+  <td
+    ref={ref}
+    className={cn('p-3 align-middle text-white/75', className)}
+    {...props}
+  />
 ));
 TableCell.displayName = 'TableCell';
 
