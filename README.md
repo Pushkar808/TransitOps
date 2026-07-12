@@ -239,59 +239,124 @@ Implemented rules:
 
 ## Quick Start (Docker — recommended)
 
-```bash
-docker compose up --build
+# 🛠️ Tech Stack
+
+## Frontend
+
+* React / Next.js
+* Tailwind CSS
+* Responsive UI Components
+* Data Visualization Charts
+
+## Backend
+
+* Node.js
+* Express.js
+* REST APIs
+
+## Database
+
+* PostgreSQL
+
+## Authentication
+
+* JWT Authentication
+
+---
+
+# 📂 Project Structure
+
+```
+TransitOps/
+
+├── frontend/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   └── styles/
+
+├── backend/
+│   ├── controllers/
+│   ├── routes/
+│   ├── models/
+│   ├── services/
+│   └── middleware/
+
+└── README.md
 ```
 
-- Frontend → http://localhost:3000
-- Backend  → http://localhost:4000
-- Postgres → localhost:5432
+---
 
-The backend automatically runs migrations and seeds demo data on first boot.
+# ⚡ Installation & Setup
 
-### Demo Credentials
+## Clone Repository
 
-| Role              | Email                     | Password    |
-|-------------------|---------------------------|-------------|
-| Admin             | admin@transitops.com      | Admin@123   |
-| Fleet Manager     | fleet@transitops.com      | Fleet@123   |
-| Driver            | driver@transitops.com      | Driver@123  |
-| Safety Officer    | safety@transitops.com     | Safety@123  |
-| Financial Analyst | finance@transitops.com    | Finance@123 |
-
-## Local Development (without Docker)
-
-### Backend
 ```bash
-cd backend
-cp .env.example .env      # adjust DATABASE_URL to your local Postgres
+git clone https://github.com/Pushkar808/TransitOps.git
+```
+
+## Navigate to Project
+
+```bash
+cd TransitOps
+```
+
+## Install Dependencies
+
+```bash
 npm install
-npx prisma migrate dev
-npm run seed
+```
+
+## Start Development Server
+
+```bash
 npm run dev
 ```
 
-### Frontend
-```bash
-cd frontend
-cp .env.example .env.local
-npm install
-npm run dev
-```
+---
 
-## Feature Coverage
+# 🚀 Future Enhancements
 
-- ✅ Auth with JWT + RBAC
-- ✅ Dashboard with KPIs + charts
-- ✅ Vehicle Registry CRUD
-- ✅ Driver Management CRUD
-- ✅ Trip Management with all validations
-- ✅ Automatic status transitions
-- ✅ Maintenance workflow (auto In Shop)
-- ✅ Fuel & Expense tracking
-- ✅ Reports & Analytics (Fuel Efficiency, Utilization, Cost, ROI)
-- ✅ CSV export
-- ✅ Dark mode
-- ✅ Search, filters & sorting
-- ✅ License-expiry email reminders (scheduled job)
-- ✅ Responsive UI
+Potential improvements:
+
+* AI-powered route optimization
+* Predictive vehicle maintenance
+* Driver behavior analysis
+* Automatic license expiry notifications
+* Vehicle document management
+* Mobile application
+* AI fleet assistant
+* Advanced reporting system
+
+---
+
+# 🏆 Hackathon Information
+
+**Project Name:** TransitOps
+
+**Theme:** Smart Transport Operations Platform
+
+**Goal:** Transform traditional fleet management into an intelligent, automated, and data-driven transport ecosystem.
+
+---
+
+# 👥 Team
+
+Built during Hackathon 🚀
+
+### Team Members
+
+* **Gaurav Srivastava** — Team Leader
+* **Pushkar Gupta** — Team Member
+* **Anam Khan** — Team Member
+
+---
+
+# 📄 License
+
+This project is developed for hackathon purposes.
+Keeping solutions innovative but realistic.
+
+
+Note: Ensure the output is tailored for beginners and includes practical advice for presenting the idea effectively to judges.
+
