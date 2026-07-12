@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar } from '@/components/sidebar';
 import { Header } from '@/components/header';
+import { Loader } from '@/components/loader';
 
 // Wraps authenticated pages: guards access and renders the app shell.
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -16,11 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
-        Loading...
-      </div>
-    );
+    return <Loader fullScreen />;
   }
 
   return (

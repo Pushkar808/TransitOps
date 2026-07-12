@@ -24,12 +24,14 @@ import { useAuth } from '@/lib/auth-context';
 import type { MaintenanceLog, Vehicle } from '@/lib/types';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { toast } from 'sonner';
+import { Loader } from '@/components/loader';
 
 export default function MaintenancePage() {
   const { hasRole } = useAuth();
   const canManage = hasRole('FLEET_MANAGER');
 
   const [logs, setLogs] = React.useState<MaintenanceLog[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [statusFilter, setStatusFilter] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
@@ -38,10 +40,13 @@ export default function MaintenancePage() {
   const load = React.useCallback(async () => {
     const params = new URLSearchParams();
     if (statusFilter) params.set('status', statusFilter);
+    setLoading(true);
     try {
       setLogs(await api.get<MaintenanceLog[]>(`/maintenance?${params.toString()}`));
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, [statusFilter]);
 
@@ -117,32 +122,39 @@ export default function MaintenancePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {logs.map((l) => (
-                <TableRow key={l.id}>
-                  <TableCell className="font-medium">{l.vehicle.registrationNo}</TableCell>
-                  <TableCell>{l.description}</TableCell>
-                  <TableCell>{formatCurrency(l.cost)}</TableCell>
-                  <TableCell>{formatDate(l.openedAt)}</TableCell>
-                  <TableCell>
-                    <Badge variant={l.status === 'OPEN' ? 'warning' : 'success'}>{l.status}</Badge>
-                  </TableCell>
-                  {canManage && (
-                    <TableCell className="text-right">
-                      {l.status === 'OPEN' && (
-                        <Button variant="ghost" size="sm" onClick={() => close(l)}>
-                          <CheckCircle className="h-4 w-4 text-green-500" /> Close
-                        </Button>
-                      )}
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-              {logs.length === 0 && (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={canManage ? 6 : 5} className="py-12 text-center">
+                    <Loader className="py-0 min-h-0" />
+                  </TableCell>
+                </TableRow>
+              ) : logs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={canManage ? 6 : 5} className="py-8 text-center text-muted-foreground">
                     No maintenance records
                   </TableCell>
                 </TableRow>
+              ) : (
+                logs.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell className="font-medium">{l.vehicle.registrationNo}</TableCell>
+                    <TableCell>{l.description}</TableCell>
+                    <TableCell>{formatCurrency(l.cost)}</TableCell>
+                    <TableCell>{formatDate(l.openedAt)}</TableCell>
+                    <TableCell>
+                      <Badge variant={l.status === 'OPEN' ? 'warning' : 'success'}>{l.status}</Badge>
+                    </TableCell>
+                    {canManage && (
+                      <TableCell className="text-right">
+                        {l.status === 'OPEN' && (
+                          <Button variant="ghost" size="sm" onClick={() => close(l)}>
+                            <CheckCircle className="h-4 w-4 text-green-500" /> Close
+                          </Button>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

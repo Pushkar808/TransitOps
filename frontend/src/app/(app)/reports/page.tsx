@@ -27,6 +27,7 @@ import { api, downloadCsv } from '@/lib/api';
 import type { VehicleReportRow } from '@/lib/types';
 import { formatCurrency } from '@/lib/format';
 import { toast } from 'sonner';
+import { Loader } from '@/components/loader';
 
 interface ReportResponse {
   rows: VehicleReportRow[];
@@ -35,12 +36,15 @@ interface ReportResponse {
 
 export default function ReportsPage() {
   const [report, setReport] = React.useState<ReportResponse | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    setLoading(true);
     api
       .get<ReportResponse>('/reports/vehicles')
       .then(setReport)
-      .catch((err) => toast.error((err as Error).message));
+      .catch((err) => toast.error((err as Error).message))
+      .finally(() => setLoading(false));
   }, []);
 
   const exportCsv = async () => {
@@ -66,6 +70,11 @@ export default function ReportsPage() {
           <Download className="h-4 w-4" /> Export CSV
         </Button>
       </PageHeader>
+
+      {loading || !report ? (
+        <Loader />
+      ) : (
+        <>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -158,6 +167,8 @@ export default function ReportsPage() {
           </Table>
         </CardContent>
       </Card>
+      </>
+      )}
     </div>
   );
 }

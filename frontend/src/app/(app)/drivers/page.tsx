@@ -29,6 +29,7 @@ import {
   isLicenseExpiringSoon,
 } from '@/lib/format';
 import { toast } from 'sonner';
+import { Loader } from '@/components/loader';
 
 const EMPTY = {
   name: '',
@@ -46,6 +47,7 @@ export default function DriversPage() {
   const canManage = hasRole('FLEET_MANAGER', 'SAFETY_OFFICER');
 
   const [drivers, setDrivers] = React.useState<Driver[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('');
   const [sortBy, setSortBy] = React.useState('createdAt');
@@ -60,10 +62,13 @@ export default function DriversPage() {
     if (statusFilter) params.set('status', statusFilter);
     params.set('sortBy', sortBy);
     params.set('order', sortBy === 'name' ? 'asc' : 'desc');
+    setLoading(true);
     try {
       setDrivers(await api.get<Driver[]>(`/drivers?${params.toString()}`));
     } catch (err) {
       toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
     }
   }, [search, statusFilter, sortBy]);
 
@@ -176,51 +181,58 @@ export default function DriversPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {drivers.map((d) => {
-                const expired = isLicenseExpired(d.licenseExpiry);
-                const soon = isLicenseExpiringSoon(d.licenseExpiry);
-                return (
-                  <TableRow key={d.id}>
-                    <TableCell className="font-medium">{d.name}</TableCell>
-                    <TableCell>{d.licenseNo}</TableCell>
-                    <TableCell>{d.licenseCategory}</TableCell>
-                    <TableCell>
-                      <span className="flex items-center gap-1">
-                        {formatDate(d.licenseExpiry)}
-                        {expired && <Badge variant="destructive">Expired</Badge>}
-                        {!expired && soon && (
-                          <span title="Expiring soon">
-                            <AlertTriangle className="h-4 w-4 text-amber-500" />
-                          </span>
-                        )}
-                      </span>
-                    </TableCell>
-                    <TableCell>{d.contact}</TableCell>
-                    <TableCell>{d.safetyScore}</TableCell>
-                    <TableCell>
-                      <Badge variant={driverStatusVariant[d.status]}>{formatStatus(d.status)}</Badge>
-                    </TableCell>
-                    {canManage && (
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(d)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => remove(d)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                );
-              })}
-              {drivers.length === 0 && (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={canManage ? 8 : 7} className="py-12 text-center">
+                    <Loader className="py-0 min-h-0" />
+                  </TableCell>
+                </TableRow>
+              ) : drivers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={canManage ? 8 : 7} className="py-8 text-center text-muted-foreground">
                     No drivers found
                   </TableCell>
                 </TableRow>
+              ) : (
+                drivers.map((d) => {
+                  const expired = isLicenseExpired(d.licenseExpiry);
+                  const soon = isLicenseExpiringSoon(d.licenseExpiry);
+                  return (
+                    <TableRow key={d.id}>
+                      <TableCell className="font-medium">{d.name}</TableCell>
+                      <TableCell>{d.licenseNo}</TableCell>
+                      <TableCell>{d.licenseCategory}</TableCell>
+                      <TableCell>
+                        <span className="flex items-center gap-1">
+                          {formatDate(d.licenseExpiry)}
+                          {expired && <Badge variant="destructive">Expired</Badge>}
+                          {!expired && soon && (
+                            <span title="Expiring soon">
+                              <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            </span>
+                          )}
+                        </span>
+                      </TableCell>
+                      <TableCell>{d.contact}</TableCell>
+                      <TableCell>{d.safetyScore}</TableCell>
+                      <TableCell>
+                        <Badge variant={driverStatusVariant[d.status]}>{formatStatus(d.status)}</Badge>
+                      </TableCell>
+                      {canManage && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(d)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => remove(d)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
