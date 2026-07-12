@@ -33,7 +33,7 @@ export default function MaintenancePage() {
   const [statusFilter, setStatusFilter] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
-  const [form, setForm] = React.useState({ vehicleId: '', description: '', cost: 0 });
+  const [form, setForm] = React.useState({ vehicleId: '', description: '', cost: '' });
 
   const load = React.useCallback(async () => {
     const params = new URLSearchParams();
@@ -50,7 +50,7 @@ export default function MaintenancePage() {
   }, [load]);
 
   const openCreate = async () => {
-    setForm({ vehicleId: '', description: '', cost: 0 });
+    setForm({ vehicleId: '', description: '', cost: '' });
     try {
       // Only Available vehicles can enter maintenance.
       const all = await api.get<Vehicle[]>('/vehicles?status=AVAILABLE');
@@ -173,7 +173,7 @@ export default function MaintenancePage() {
           </div>
           <div className="space-y-1">
             <Label>Estimated Cost</Label>
-            <Input type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: Number(e.target.value) })} />
+            <Input type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} />
           </div>
           <Button type="submit" className="w-full">
             Open Maintenance

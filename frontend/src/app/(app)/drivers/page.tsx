@@ -36,7 +36,7 @@ const EMPTY = {
   licenseCategory: 'LGV',
   licenseExpiry: '',
   contact: '',
-  safetyScore: 100,
+  safetyScore: '100',
   region: '',
   status: 'AVAILABLE' as DriverStatus,
 };
@@ -274,12 +274,18 @@ export default function DriversPage() {
                 min={0}
                 max={100}
                 value={form.safetyScore}
-                onChange={(e) => setForm({ ...form, safetyScore: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, safetyScore: e.target.value })}
               />
             </div>
             <div className="space-y-1">
               <Label>Region</Label>
-              <Input value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} />
+              <Select value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })}>
+                <option value="">Select region</option>
+                <option value="North">North</option>
+                <option value="South">South</option>
+                <option value="East">East</option>
+                <option value="West">West</option>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label>Status</Label>

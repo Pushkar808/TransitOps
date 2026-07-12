@@ -28,9 +28,9 @@ const EMPTY = {
   registrationNo: '',
   name: '',
   type: 'Van',
-  maxLoadKg: 0,
-  odometer: 0,
-  acquisitionCost: 0,
+  maxLoadKg: '',
+  odometer: '',
+  acquisitionCost: '',
   region: '',
   status: 'AVAILABLE' as VehicleStatus,
 };
@@ -259,7 +259,7 @@ export default function VehiclesPage() {
               <Input
                 type="number"
                 value={form.maxLoadKg}
-                onChange={(e) => setForm({ ...form, maxLoadKg: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, maxLoadKg: e.target.value })}
                 required
               />
             </div>
@@ -268,7 +268,7 @@ export default function VehiclesPage() {
               <Input
                 type="number"
                 value={form.odometer}
-                onChange={(e) => setForm({ ...form, odometer: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, odometer: e.target.value })}
               />
             </div>
             <div className="space-y-1">
@@ -276,15 +276,18 @@ export default function VehiclesPage() {
               <Input
                 type="number"
                 value={form.acquisitionCost}
-                onChange={(e) => setForm({ ...form, acquisitionCost: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, acquisitionCost: e.target.value })}
               />
             </div>
             <div className="space-y-1">
               <Label>Region</Label>
-              <Input
-                value={form.region}
-                onChange={(e) => setForm({ ...form, region: e.target.value })}
-              />
+              <Select value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })}>
+                <option value="">Select region</option>
+                <option value="North">North</option>
+                <option value="South">South</option>
+                <option value="East">East</option>
+                <option value="West">West</option>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label>Status</Label>
