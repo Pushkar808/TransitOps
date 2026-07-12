@@ -233,3 +233,124 @@ Implemented rules:
 
 ---
 
+# 🛠️ Tech Stack
+
+## Frontend
+
+* React / Next.js
+* Tailwind CSS
+* Responsive UI Components
+* Data Visualization Charts
+
+## Backend
+
+* Node.js
+* Express.js
+* REST APIs
+
+## Database
+
+* PostgreSQL
+
+## Authentication
+
+* JWT Authentication
+
+---
+
+# 📂 Project Structure
+
+```
+TransitOps/
+
+├── frontend/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   └── styles/
+
+├── backend/
+│   ├── controllers/
+│   ├── routes/
+│   ├── models/
+│   ├── services/
+│   └── middleware/
+
+└── README.md
+```
+
+---
+
+# ⚡ Installation & Setup
+
+## Clone Repository
+
+```bash
+git clone https://github.com/Pushkar808/TransitOps.git
+```
+
+## Navigate to Project
+
+```bash
+cd TransitOps
+```
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+## Start Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+# 🚀 Future Enhancements
+
+Potential improvements:
+
+* AI-powered route optimization
+* Predictive vehicle maintenance
+* Driver behavior analysis
+* Automatic license expiry notifications
+* Vehicle document management
+* Mobile application
+* AI fleet assistant
+* Advanced reporting system
+
+---
+
+# 🏆 Hackathon Information
+
+**Project Name:** TransitOps
+
+**Theme:** Smart Transport Operations Platform
+
+**Goal:** Transform traditional fleet management into an intelligent, automated, and data-driven transport ecosystem.
+
+---
+
+# 👥 Team
+
+Built during Hackathon 🚀
+
+### Team Members
+
+* **Gaurav Srivastava** — Team Leader
+* **Pushkar Gupta** — Team Member
+* **Anam Khan** — Team Member
+
+---
+
+# 📄 License
+
+This project is developed for hackathon purposes.
+Keeping solutions innovative but realistic.
+
+
+Note: Ensure the output is tailored for beginners and includes practical advice for presenting the idea effectively to judges.
+
