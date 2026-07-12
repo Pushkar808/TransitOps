@@ -11,10 +11,7 @@ const app = express();
 
 app.use(helmet());
 app.use(
-  cors({
-    origin: env.corsOrigin.split(',').map((o) => o.trim()),
-    credentials: true,
-  })
+  cors()
 );
 app.use(express.json({ limit: '1mb' }));
 if (env.nodeEnv !== 'test') app.use(morgan('dev'));
