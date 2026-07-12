@@ -12,8 +12,8 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.corsOrigin.split(',').map((o) => o.trim()),
-    credentials: true,
+    origin: "http://localhost:3000/", // your Next app
+    credentials: true
   })
 );
 app.use(express.json({ limit: '1mb' }));
