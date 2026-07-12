@@ -112,7 +112,7 @@ export default function LoginPage() {
 
       <div className="relative flex flex-col min-h-screen" style={{ zIndex: 1 }}>
         {/* ─── Navbar ────────────────────────────────────────── */}
-        <div className="px-6 md:px-12 lg:px-16 pt-6">
+        {/* <div className="px-6 md:px-12 lg:px-16 pt-6">
           <nav className="liquid-glass rounded-xl px-4 py-2 flex items-center justify-between">
             <span className="text-2xl font-semibold tracking-tight text-white select-none">
               TransitOps
@@ -135,7 +135,7 @@ export default function LoginPage() {
               Sign In
             </button>
           </nav>
-        </div>
+        </div> */}
 
         {/* ─── Hero + Card ───────────────────────────────────── */}
         <div className="flex-1 flex flex-col justify-end px-6 md:px-12 lg:px-16 pb-12 lg:pb-16">
@@ -155,7 +155,7 @@ export default function LoginPage() {
                   expenses — all from a single, intelligent platform.
                 </p>
               </FadeIn>
-              <FadeIn delay={1200} duration={1000}>
+              {/* <FadeIn delay={1200} duration={1000}>
                 <div className="flex flex-wrap gap-4">
                   <button
                     onClick={() => switchMode('signup')}
@@ -170,7 +170,7 @@ export default function LoginPage() {
                     Explore Now
                   </button>
                 </div>
-              </FadeIn>
+              </FadeIn> */}
             </div>
 
             {/* Right Column */}
@@ -179,7 +179,7 @@ export default function LoginPage() {
               <FadeIn delay={1400} duration={1000}>
                 <div className="liquid-glass border border-white/20 px-6 py-3 rounded-xl">
                   <span className="text-lg md:text-xl lg:text-2xl font-light text-white">
-                    Vehicles. Drivers. Finance.
+                    TransitOPS
                   </span>
                 </div>
               </FadeIn>
