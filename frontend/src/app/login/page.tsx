@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { toast } from 'sonner';
 import { AnimatedHeading } from '@/components/animated-heading';
 import { FadeIn } from '@/components/fade-in';
+import { LogisticsHeroPlayer } from '@/components/logistics-hero-player';
 
 const DEMO_ACCOUNTS = [
   { label: 'Admin', email: 'admin@transitops.com', password: 'Admin@123' },
@@ -43,19 +44,7 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-black text-white flex flex-col">
       {/* ─── Video Background ─────────────────────────────────────── */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ zIndex: 0 }}
-      >
-        <source
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4"
-          type="video/mp4"
-        />
-      </video>
+      <LogisticsHeroPlayer />
 
       {/* ─── Content (above video) ─────────────────────────────────── */}
       <div className="relative flex flex-col min-h-screen" style={{ zIndex: 1 }}>
